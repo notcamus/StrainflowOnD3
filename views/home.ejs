@@ -1,0 +1,136 @@
+<%- include('partials/header') %>     
+    <!-- ======= Headbar ======= -->
+ 
+      <div class="sub-nav">
+        <div class="container">
+              </div>
+            </div>
+            <div class="col-lg-3"></div>
+          </div>
+        </div>
+        
+        
+      </div>
+      
+    </section><!-- End headbar -->
+
+
+    <!-- Search Models -->
+    
+    <section id="section_container" class="section_container">
+      <div class="container" data-aos="fade-in" data-aos-duration="800">    
+        <div class="section-title" style="text-align:center">
+          <h2 style="color: #fff">Line Plot</h2>                
+      </div>
+        
+
+        <div class="row">
+          <div class="col-lg-2 col-md-2 "></div>
+          <div class="div_bottom_margin col-lg-8 col-md-8 mt-lg-0 d-flex align-items-stretch justify-content-center" >
+            <div class="blue_container">
+              <div style="padding:10px;">
+               
+                    <br/>
+                    <br/>
+                    <div style="display:flex;justify-content:center"> 
+                     <!-- Content goes here -->
+                     <div id="my_dataviz"></div>
+
+                    </div>
+                    
+            
+            
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-2 col-md-2"></div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- End Search Models Section -->
+
+
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+ 
+<script>
+var margin = {top: 30, right: 40, bottom: 30, left: 50},
+    width = 800 - margin.left - margin.right,
+    height = 270 - margin.top - margin.bottom;
+
+var parseDate = d3.time.format("%d-%b-%y").parse;
+
+var x = d3.time.scale().range([0, width]);
+var y0 = d3.scale.linear().range([height, 0]);
+var y1 = d3.scale.linear().range([height, 0]);
+
+var xAxis = d3.svg.axis().scale(x)
+    .orient("bottom").ticks(5);
+
+var yAxisLeft = d3.svg.axis().scale(y0)
+    .orient("left").ticks(5);
+
+var yAxisRight = d3.svg.axis().scale(y1)
+    .orient("right").ticks(5); 
+
+var valueline = d3.svg.line()
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y0(d.close); });
+    
+var valueline2 = d3.svg.line()
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y1(d.open); });
+  
+var svg = d3.select("#my_dataviz")
+    .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+        .attr("transform", 
+              "translate(" + margin.left + "," + margin.top + ")");
+
+// Get the data
+d3.csv("data2a.csv", function(error, data) {
+    data.forEach(function(d) {
+        d.date = parseDate(d.date);
+        d.close = +d.close;
+        d.open = +d.open;
+    });
+
+    // Scale the range of the data
+    x.domain(d3.extent(data, function(d) { return d.date; }));
+    y0.domain([0, d3.max(data, function(d) {
+		return Math.max(d.close); })]); 
+    y1.domain([0, d3.max(data, function(d) { 
+		return Math.max(d.open); })]);
+
+    svg.append("path")        // Add the valueline path.
+        .attr("d", valueline(data));
+
+    svg.append("path")        // Add the valueline2 path.
+        .style("stroke", "red")
+        .attr("d", valueline2(data));
+
+    svg.append("g")            // Add the X Axis
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+
+    svg.append("g")
+        .attr("class", "y axis")
+        .style("fill", "steelblue")
+        .call(yAxisLeft);	
+
+    svg.append("g")				
+        .attr("class", "y axis")	
+        .attr("transform", "translate(" + width + " ,0)")	
+        .style("fill", "red")		
+        .call(yAxisRight);
+
+});
+
+</script>
+    <%- include('partials/footer') %>        
